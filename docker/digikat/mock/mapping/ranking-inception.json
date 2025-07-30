@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": { "equalTo": "Inception" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ranking-inception-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

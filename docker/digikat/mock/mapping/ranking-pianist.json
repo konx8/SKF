@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": { "equalTo": "Pianist" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ranking-pianist-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

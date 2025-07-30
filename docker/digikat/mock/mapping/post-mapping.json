@@ -1,0 +1,21 @@
+{
+  "request": {
+    "method": "POST",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": {
+        "matches": ".*"
+      },
+      "ocenaKrytykow": {
+        "matches": "\\d{1,3}"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": "{\"message\": \"Ranking updated successfully\"}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

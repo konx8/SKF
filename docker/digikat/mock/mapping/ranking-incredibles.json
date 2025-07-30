@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": { "equalTo": "Incredibles" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ranking-incredibles-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

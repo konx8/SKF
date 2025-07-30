@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": { "equalTo": "Interstellar" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ranking-interstellar-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

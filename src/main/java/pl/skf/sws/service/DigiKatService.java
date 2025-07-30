@@ -1,0 +1,18 @@
+package pl.skf.sws.service;
+
+import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
+import pl.skf.sws.feign.DigiKatClient;
+import pl.skf.sws.model.DigiKatResponse;
+
+@Service
+@AllArgsConstructor
+public class DigiKatService {
+
+    private DigiKatClient digiKatClient;
+
+    public DigiKatResponse getRankingByTitle(String title) {
+        return digiKatClient.getRanking(title);
+    }
+
+}

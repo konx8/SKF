@@ -1,0 +1,16 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": { "equalTo": "Odyssey" }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ranking-odyssey-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
