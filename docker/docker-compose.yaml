@@ -12,6 +12,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init-scripts:/docker-entrypoint-initdb.d
+      - ../uploads:/app/uploads
 
   wiremock:
     image: wiremock/wiremock:latest

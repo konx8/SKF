@@ -51,4 +51,8 @@ public class Movie {
     @JsonManagedReference
     private List<MovieAvailability> availabilities;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }
