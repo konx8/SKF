@@ -1,19 +1,18 @@
 package pl.skf.sws.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import pl.skf.sws.adapter.DigiKatRankingAdapter;
 import pl.skf.sws.exception.EmptyFileException;
 import pl.skf.sws.exception.FileStorageException;
 import pl.skf.sws.exception.FileToHeavyException;
-import pl.skf.sws.model.Movie;
-import pl.skf.sws.model.MovieDto;
-import pl.skf.sws.model.MoviePatchDto;
-import pl.skf.sws.model.User;
+import pl.skf.sws.exception.MovieNotFoundException;
+import pl.skf.sws.feign.DigiKatClient;
+import pl.skf.sws.model.*;
 import pl.skf.sws.repo.MovieRepo;
 import pl.skf.sws.service.impl.MovieService;
 import pl.skf.sws.service.impl.UserService;
@@ -35,15 +34,21 @@ public class MovieServiceImpl implements MovieService {
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-
     private final MovieRepo movieRepo;
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final DigiKatClient digiKatClient;
+    private final DigiKatRankingAdapter digiKatRankingAdapter;
 
-    public MovieServiceImpl(MovieRepo movieRepo, UserService userService, ModelMapper modelMapper) {
+
+    public MovieServiceImpl(MovieRepo movieRepo, UserService userService,
+                            ModelMapper modelMapper, DigiKatClient digiKatClient,
+                            DigiKatRankingAdapter digiKatRankingAdapter) {
         this.movieRepo = movieRepo;
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.digiKatClient = digiKatClient;
+        this.digiKatRankingAdapter = digiKatRankingAdapter;
     }
 
     @Transactional
@@ -53,6 +58,7 @@ public class MovieServiceImpl implements MovieService {
         String savedFilePath = storeFile(file);
         User user = userService.getUserById(userId);
         Movie movie = assigningDataToMovie(movieDto, savedFilePath, file, user);
+        movie.setId(null);
         return save(movie, savedFilePath);
     }
 
@@ -65,8 +71,7 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public void updateMovie(Long movieId, MoviePatchDto moviePatchDto) {
         log.info("Updating movie with id: {}", movieId);
-        Movie movie = movieRepo.findById(movieId)
-                .orElseThrow(() -> new EntityNotFoundException("Movie not found with id: " + movieId));
+        Movie movie = getMovie(movieId);
 
         modelMapper.map(moviePatchDto, movie);
 
@@ -75,6 +80,23 @@ public class MovieServiceImpl implements MovieService {
 
     }
 
+    @Override
+    public RankingDto getMovieRanking(long id) {
+        Movie movie = getMovie(id);
+        DigiKatResponse digiKatResponse;
+        try{
+            digiKatResponse = digiKatClient.getRanking(movie.getTitle());
+        } catch (Exception ex){
+            throw new MovieNotFoundException("Movie not found with id: " + id);
+        }
+
+        return digiKatRankingAdapter.adapt(movie, digiKatResponse);
+    }
+
+    private Movie getMovie(Long id) {
+        return movieRepo.findById(id)
+                .orElseThrow(() -> new MovieNotFoundException("Movie not found with id: " + id));
+    }
 
     private Movie assigningDataToMovie(MovieDto movieDto, String savedFilePath, MultipartFile file, User user) {
         Movie movie  = modelMapper.map(movieDto, Movie.class);
@@ -82,6 +104,8 @@ public class MovieServiceImpl implements MovieService {
         movie.setFileSize(file.getSize());
         movie.setFilePath(savedFilePath);
         movie.setUser(user);
+        movie.setCreatedAt(LocalDateTime.now());
+        movie.setUpdatedAt(LocalDateTime.now());
         return movie;
     }
 
@@ -96,6 +120,7 @@ public class MovieServiceImpl implements MovieService {
             }
             throw e;
         }
+        log.info("Saved on DB Successfully ");
         return movie.getId();
     }
 

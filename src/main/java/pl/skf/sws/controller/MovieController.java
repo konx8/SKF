@@ -6,10 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import pl.skf.sws.model.DigiKatResponse;
-import pl.skf.sws.model.Movie;
-import pl.skf.sws.model.MovieDto;
-import pl.skf.sws.model.MoviePatchDto;
+import pl.skf.sws.model.*;
 import pl.skf.sws.service.impl.DigiKatService;
 import pl.skf.sws.service.impl.MovieService;
 
@@ -37,6 +34,12 @@ public class MovieController {
             @RequestBody MoviePatchDto moviePatchDto) {
         movieService.updateMovie(movieId, moviePatchDto);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/ranking")
+    public ResponseEntity<RankingDto> getRanking(@PathVariable Long id) {
+        RankingDto rankingDto = movieService.getMovieRanking(id);
+        return ResponseEntity.ok(rankingDto);
     }
 
     @GetMapping
