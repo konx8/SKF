@@ -21,6 +21,7 @@ server:
   servlet:
     context-path: /skf
 
+# mocked service in docker
 digikat:
   url: http://localhost:8081
 
