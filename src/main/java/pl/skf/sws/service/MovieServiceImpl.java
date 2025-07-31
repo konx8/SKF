@@ -1,7 +1,9 @@
 package pl.skf.sws.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -10,6 +12,7 @@ import pl.skf.sws.exception.FileStorageException;
 import pl.skf.sws.exception.FileToHeavyException;
 import pl.skf.sws.model.Movie;
 import pl.skf.sws.model.MovieDto;
+import pl.skf.sws.model.MoviePatchDto;
 import pl.skf.sws.model.User;
 import pl.skf.sws.repo.MovieRepo;
 import pl.skf.sws.service.impl.MovieService;
@@ -19,6 +22,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -26,22 +30,24 @@ import java.util.UUID;
 @Service
 public class MovieServiceImpl implements MovieService {
 
+    private final static int FILE_MAX_SIZE = 1073741824; // 1Gb
+
     @Value("${file.upload-dir}")
     private String uploadDir;
 
+
     private final MovieRepo movieRepo;
     private final UserService userService;
+    private final ModelMapper modelMapper;
 
-    public MovieServiceImpl(MovieRepo movieRepo, UserService userService) {
+    public MovieServiceImpl(MovieRepo movieRepo, UserService userService, ModelMapper modelMapper) {
         this.movieRepo = movieRepo;
         this.userService = userService;
-    }
-
-    public List<Movie> allMovie() {
-        return movieRepo.findAll();
+        this.modelMapper = modelMapper;
     }
 
     @Transactional
+    @Override
     public Long saveMovie(MovieDto movieDto, MultipartFile file, Long userId) {
         validateFile(file);
         String savedFilePath = storeFile(file);
@@ -50,11 +56,29 @@ public class MovieServiceImpl implements MovieService {
         return save(movie, savedFilePath);
     }
 
+    @Override
+    public List<Movie> allMovie() {
+        return movieRepo.findAll();
+    }
+
+    @Transactional
+    @Override
+    public void updateMovie(Long movieId, MoviePatchDto moviePatchDto) {
+        log.info("Updating movie with id: {}", movieId);
+        Movie movie = movieRepo.findById(movieId)
+                .orElseThrow(() -> new EntityNotFoundException("Movie not found with id: " + movieId));
+
+        modelMapper.map(moviePatchDto, movie);
+
+        movie.setUpdatedAt(LocalDateTime.now());
+        movieRepo.save(movie);
+
+    }
+
+
     private Movie assigningDataToMovie(MovieDto movieDto, String savedFilePath, MultipartFile file, User user) {
-        Movie movie = new Movie();
-        movie.setTitle(movieDto.getTitle());
-        movie.setDirector(movieDto.getDirector());
-        movie.setReleaseYear(movieDto.getYear());
+        Movie movie  = modelMapper.map(movieDto, Movie.class);
+
         movie.setFileSize(file.getSize());
         movie.setFilePath(savedFilePath);
         movie.setUser(user);
@@ -80,7 +104,7 @@ public class MovieServiceImpl implements MovieService {
         if (file.isEmpty()) {
             throw new EmptyFileException("The file has not been added.");
         }
-        if (file.getSize() > 1024L * 1024 * 1024) {
+        if (file.getSize() > FILE_MAX_SIZE) {
             throw new FileToHeavyException("File  to heavy, maximum size is 1GB");
         }
         log.info("File correct");

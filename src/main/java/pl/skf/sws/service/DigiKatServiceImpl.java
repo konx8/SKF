@@ -12,6 +12,7 @@ public class DigiKatServiceImpl implements DigiKatService {
 
     private DigiKatClient digiKatClient;
 
+    @Override
     public DigiKatResponse getRankingByTitle(String title) {
         return digiKatClient.getRanking(title);
     }
