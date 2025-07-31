@@ -1,8 +1,10 @@
 package pl.skf.sws.adapter;
 
 import org.springframework.stereotype.Component;
-import pl.skf.sws.component.impl.RankingCalculator;
+import pl.skf.sws.component.ranking.RankingCalculator;
 import pl.skf.sws.model.*;
+import pl.skf.sws.model.enums.ProductionType;
+import pl.skf.sws.model.enums.UserRating;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -38,6 +40,7 @@ public class DigiKatRankingAdapter {
                 .map(Enum::name)
                 .orElse(UserRating.UNKNOWN.name()));
 
+        rankingDto.setFileSize(movie.getFileSize());
         return rankingDto;
     }
 

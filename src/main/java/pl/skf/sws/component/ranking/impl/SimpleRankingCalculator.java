@@ -1,8 +1,11 @@
-package pl.skf.sws.component;
+package pl.skf.sws.component.ranking.impl;
 
 import org.springframework.stereotype.Component;
-import pl.skf.sws.component.impl.RankingCalculator;
+import pl.skf.sws.component.ranking.RankingCalculator;
 import pl.skf.sws.model.*;
+import pl.skf.sws.model.enums.AvailabilityPlatform;
+import pl.skf.sws.model.enums.ProductionType;
+import pl.skf.sws.model.enums.UserRating;
 
 @Component
 public class SimpleRankingCalculator implements RankingCalculator {

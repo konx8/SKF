@@ -2,6 +2,9 @@ package pl.skf.sws.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
+import pl.skf.sws.model.enums.AvailabilityPlatform;
+import pl.skf.sws.model.enums.ProductionType;
+import pl.skf.sws.model.enums.UserRating;
 
 import java.util.Collections;
 import java.util.List;
