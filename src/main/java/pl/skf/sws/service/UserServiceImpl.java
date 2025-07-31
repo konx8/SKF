@@ -5,10 +5,11 @@ import org.springframework.stereotype.Service;
 import pl.skf.sws.exception.UserNotFoundException;
 import pl.skf.sws.model.User;
 import pl.skf.sws.repo.UserRepo;
+import pl.skf.sws.service.impl.UserService;
 
 @Service
 @AllArgsConstructor
-public class UserService {
+public class UserServiceImpl implements UserService {
 
     private UserRepo userRepo;
 

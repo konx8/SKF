@@ -12,6 +12,8 @@ import pl.skf.sws.model.Movie;
 import pl.skf.sws.model.MovieDto;
 import pl.skf.sws.model.User;
 import pl.skf.sws.repo.MovieRepo;
+import pl.skf.sws.service.impl.MovieService;
+import pl.skf.sws.service.impl.UserService;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -22,15 +24,15 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-public class MovieService {
+public class MovieServiceImpl implements MovieService {
 
     @Value("${file.upload-dir}")
     private String uploadDir;
 
-    private MovieRepo movieRepo;
-    private UserService userService;
+    private final MovieRepo movieRepo;
+    private final UserService userService;
 
-    public MovieService(MovieRepo movieRepo, UserService userService) {
+    public MovieServiceImpl(MovieRepo movieRepo, UserService userService) {
         this.movieRepo = movieRepo;
         this.userService = userService;
     }
