@@ -1,12 +1,16 @@
 package pl.skf.sws.controller;
 
 import lombok.AllArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.skf.sws.model.DigiKatResponse;
 import pl.skf.sws.model.Movie;
-import pl.skf.sws.service.DigiKatService;
-import pl.skf.sws.service.MovieService;
+import pl.skf.sws.model.MovieDto;
+import pl.skf.sws.service.impl.DigiKatService;
+import pl.skf.sws.service.impl.MovieService;
 
 import java.util.List;
 
@@ -14,8 +18,17 @@ import java.util.List;
 @AllArgsConstructor
 public class MovieController {
 
-    private MovieService movieService;
-    private DigiKatService digiKatService;
+    final private MovieService movieService;
+    final private DigiKatService digiKatService;
+
+    @PostMapping(value = "/movies", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Long> addMovie(
+            @RequestPart("movie") MovieDto movieDto,
+            @RequestPart("file") MultipartFile file,
+            @RequestPart("userId") Long userId
+            ) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(movieService.saveMovie(movieDto, file, userId));
+    }
 
     @GetMapping("/movies")
     public List<Movie> getAllMovies(){

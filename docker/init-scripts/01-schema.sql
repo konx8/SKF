@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS app_user (
+    id SERIAL PRIMARY KEY,
+    login VARCHAR(100) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS movie (
     id SERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -10,8 +16,11 @@ CREATE TABLE IF NOT EXISTS movie (
     user_rating VARCHAR(20),
     last_update TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    user_id INT REFERENCES app_user(id) ON DELETE SET NULL
 );
+
 
 CREATE TABLE IF NOT EXISTS movie_availability (
     id SERIAL PRIMARY KEY,
@@ -19,5 +28,4 @@ CREATE TABLE IF NOT EXISTS movie_availability (
     platform VARCHAR(100) NOT NULL,
     UNIQUE(movie_id, platform)
 );
-
 
