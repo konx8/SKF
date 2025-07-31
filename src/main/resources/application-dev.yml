@@ -27,3 +27,4 @@ digikat:
 
 file:
   upload-dir: uploads
+  max-size: 1073741824

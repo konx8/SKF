@@ -51,4 +51,12 @@ public class GlobalExceptionHandler {
                 .body("Movie not found");
     }
 
+    @ExceptionHandler(InvalidSortTypeException.class)
+    public ResponseEntity<String> handleInvalidSortTypeException() {
+        log.error("Invalid sort type");
+        return ResponseEntity
+                .badRequest()
+                .body("Invalid sort type");
+    }
+
 }

@@ -1,4 +1,4 @@
-package pl.skf.sws.component.impl;
+package pl.skf.sws.component.ranking;
 
 import pl.skf.sws.model.DigiKatResponse;
 import pl.skf.sws.model.Movie;

@@ -6,19 +6,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pl.skf.sws.exception.InvalidSortTypeException;
 import pl.skf.sws.model.*;
-import pl.skf.sws.service.impl.DigiKatService;
-import pl.skf.sws.service.impl.MovieService;
+import pl.skf.sws.service.MovieService;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @AllArgsConstructor
 @RequestMapping("/movies")
 public class MovieController {
 
+    private static final Set<String> ALLOWED_SORTS = Set.of("ranking", "size");
+
     final private MovieService movieService;
-    final private DigiKatService digiKatService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> addMovie(
@@ -43,13 +45,12 @@ public class MovieController {
     }
 
     @GetMapping
-    public List<Movie> getAllMovies() {
-        return movieService.allMovie();
-    }
-
-    @GetMapping("/digiKat")
-    public DigiKatResponse getDigiKat() {
-        return digiKatService.getRankingByTitle("Avengers");
+    public ResponseEntity<List<RankingDto>> getAllMovies(
+            @RequestParam(name = "sort", defaultValue = "ranking") String sortBy) {
+        if (!ALLOWED_SORTS.contains(sortBy)) {
+            throw new InvalidSortTypeException("Invalid sort type: " + sortBy);
+        }
+        return ResponseEntity.ok(movieService.getAllMoviesSorted(sortBy));
     }
 
 }

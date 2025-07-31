@@ -21,4 +21,6 @@ public class RankingDto {
 
     private String userRating;
 
+    private Long fileSize;
+
 }

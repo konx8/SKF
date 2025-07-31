@@ -1,4 +1,4 @@
-package pl.skf.sws.model;
+package pl.skf.sws.model.enums;
 
 public enum UserRating {
 

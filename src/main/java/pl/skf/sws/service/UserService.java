@@ -1,4 +1,4 @@
-package pl.skf.sws.service.impl;
+package pl.skf.sws.service;
 
 import pl.skf.sws.model.User;
 

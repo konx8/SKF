@@ -1,0 +1,18 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/ranking",
+    "queryParameters": {
+      "film": {
+        "equalTo": "The Dark Knight"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "ranking-the-dark-knight-response.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
