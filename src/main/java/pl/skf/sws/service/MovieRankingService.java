@@ -24,15 +24,19 @@ import java.util.concurrent.Executors;
 public class MovieRankingService {
 
     @Value("${thread-pool.size}")
-    private int threadPoolSize;
+    private final int threadPoolSize;
 
     private final DigiKatClient digiKatClient;
     private final DigiKatRankingAdapter digiKatRankingAdapter;
     private ExecutorService threadPool;
 
-    public MovieRankingService(DigiKatClient digiKatClient, DigiKatRankingAdapter digiKatRankingAdapter) {
+    private final Map<String, CompletableFuture<RankingDto>> cache = new ConcurrentHashMap<>();
+
+    public MovieRankingService(DigiKatClient digiKatClient, DigiKatRankingAdapter digiKatRankingAdapter,
+                               @Value("${thread-pool.size}") int threadPoolSize) {
         this.digiKatClient = digiKatClient;
         this.digiKatRankingAdapter = digiKatRankingAdapter;
+        this.threadPoolSize = threadPoolSize;
     }
 
     @PostConstruct
@@ -48,29 +52,17 @@ public class MovieRankingService {
 
     public List<RankingDto> getRankingsForMovies(List<Movie> movies) {
         log.info("Getting Rankings for Movies Started");
-        Map<String, CompletableFuture<RankingDto>> cache = new ConcurrentHashMap<>();
 
-        List<CompletableFuture<RankingDto>> futureList = movies.stream()
-                .map(movie -> cache.computeIfAbsent(movie.getTitle(), title ->
-                        CompletableFuture.supplyAsync(() -> {
-                            try {
-                                DigiKatResponse response = digiKatClient.getRanking(title);
-                                return digiKatRankingAdapter.adapt(movie, response);
-                            } catch (Exception e) {
-                                log.error("Error retrieving ranking for {}: {}", title, e.getMessage(), e);
-                                return null;
-                            }
-
-                        }, threadPool)
-                ))
+        List<CompletableFuture<RankingDto>> futures = movies.stream()
+                .map(this::getRankingForMovie)
                 .toList();
 
-        return futureList.stream()
+        return futures.stream()
                 .map(future -> {
                     try {
                         return future.join();
                     } catch (Exception e) {
-                        log.error("Error combining future: {}", e.getMessage(), e);
+                        log.error("Error joining future: {}", e.getMessage(), e);
                         return null;
                     }
                 })
@@ -78,4 +70,18 @@ public class MovieRankingService {
                 .toList();
     }
 
+    private CompletableFuture<RankingDto> getRankingForMovie(Movie movie) {
+        return cache.computeIfAbsent(movie.getTitle(), title ->
+                CompletableFuture.supplyAsync(() -> fetchRanking(movie), threadPool));
+    }
+
+    private RankingDto fetchRanking(Movie movie) {
+        try {
+            DigiKatResponse response = digiKatClient.getRanking(movie.getTitle());
+            return digiKatRankingAdapter.adapt(movie, response);
+        } catch (Exception e) {
+            log.error("Error retrieving ranking for {}: {}", movie.getTitle(), e.getMessage(), e);
+            return null;
+        }
+    }
 }

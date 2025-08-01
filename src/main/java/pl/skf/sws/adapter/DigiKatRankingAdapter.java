@@ -1,5 +1,6 @@
 package pl.skf.sws.adapter;
 
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import pl.skf.sws.component.ranking.RankingCalculator;
 import pl.skf.sws.model.*;
@@ -10,13 +11,10 @@ import java.util.Collections;
 import java.util.Optional;
 
 @Component
+@AllArgsConstructor
 public class DigiKatRankingAdapter {
 
     private final RankingCalculator rankingCalculator;
-
-    public DigiKatRankingAdapter(RankingCalculator rankingCalculator) {
-        this.rankingCalculator = rankingCalculator;
-    }
 
     public RankingDto adapt(Movie movie, DigiKatResponse digiKatResponse) {
         RankingDto rankingDto = new RankingDto();

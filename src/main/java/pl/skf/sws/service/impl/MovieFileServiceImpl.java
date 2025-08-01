@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
@@ -24,10 +25,10 @@ import java.util.UUID;
 public class MovieFileServiceImpl implements MovieFileService {
 
     @Value("${file.upload-dir}")
-    private String uploadDir;
+    String uploadDir;
 
     @Value("${file.max-size}")
-    private Long maxSizeOfFile;
+    Long maxSizeOfFile;
 
     public Resource loadFileAsResource(String filePath) throws FileNotFoundException {
         try {
@@ -38,7 +39,7 @@ public class MovieFileServiceImpl implements MovieFileService {
             } else {
                 throw new FileNotFoundException("File not found or not readable: " + filePath);
             }
-        } catch (MalformedURLException e) {
+        } catch (MalformedURLException | InvalidPathException e) {
             throw new RuntimeException("Error loading file: " + filePath, e);
         }
     }
@@ -56,9 +57,8 @@ public class MovieFileServiceImpl implements MovieFileService {
 
     public String storeFile(MultipartFile file) {
         try {
-            String dir = uploadDir;
             String filename = UUID.randomUUID() + "-" + file.getOriginalFilename();
-            Path filePath = Paths.get(dir, filename);
+            Path filePath = Paths.get(uploadDir, filename);
             Files.createDirectories(filePath.getParent());
             Files.write(filePath, file.getBytes());
             log.info("File successfully saved");
