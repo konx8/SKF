@@ -15,8 +15,8 @@ public class MovieSortingFactory {
 
     public MovieSortingFactory(List<MovieSortingStrategy> strategies) {
         this.strategyMap = strategies.stream()
-                .collect(Collectors.toMap(s ->
-                        s.getClass().getAnnotation(Component.class).value(), Function.identity()));
+                .collect(Collectors.toMap(strategy ->
+                        strategy.getClass().getAnnotation(Component.class).value(), Function.identity()));
     }
 
     public MovieSortingStrategy getStrategy(String key) {

@@ -28,3 +28,10 @@ digikat:
 file:
   upload-dir: uploads
   max-size: 1073741824
+
+thread-pool:
+  size: 10
+
+page:
+  max-size: 50
+  default-size: 5

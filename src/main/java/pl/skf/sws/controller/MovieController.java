@@ -46,11 +46,13 @@ public class MovieController {
 
     @GetMapping
     public ResponseEntity<List<RankingDto>> getAllMovies(
-            @RequestParam(name = "sort", defaultValue = "ranking") String sortBy) {
+            @RequestParam(name = "sort", defaultValue = "ranking") String sortBy,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "5") int size) {
         if (!ALLOWED_SORTS.contains(sortBy)) {
             throw new InvalidSortTypeException("Invalid sort type: " + sortBy);
         }
-        return ResponseEntity.ok(movieService.getAllMoviesSorted(sortBy));
+        return ResponseEntity.ok(movieService.getAllMoviesRankingSorted(sortBy, page, size));
     }
 
 }

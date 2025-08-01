@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface MovieService {
 
-    List<RankingDto> getAllMoviesSorted(String sortBy);
+    List<RankingDto> getAllMoviesRankingSorted(String sortBy, int page, int size);
 
     Long saveMovie(MovieDto movieDto, MultipartFile file, Long userId);
 

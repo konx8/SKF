@@ -11,6 +11,6 @@ public class MoviePatchDto {
 
     private String director;
 
-    private Integer year;
+    private Integer releaseYear;
 
 }
