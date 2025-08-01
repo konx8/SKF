@@ -52,6 +52,4 @@ public class DigiKatResponse {
         return UserRating.fromString(this.userRating);
     }
 
-
-
 }

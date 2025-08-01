@@ -33,9 +33,9 @@ import java.util.List;
 public class MovieServiceImpl implements MovieService {
 
     @Value("${page.max-size}")
-    private int pageMaxSize;
+    int pageMaxSize;
     @Value("${page.default-size}")
-    private int pageDefaultSize;
+    int pageDefaultSize;
 
     private final MovieRepo movieRepo;
     private final UserService userService;
