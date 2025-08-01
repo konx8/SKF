@@ -1,15 +1,19 @@
 package pl.skf.sws.controller;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 import pl.skf.sws.exception.InvalidSortTypeException;
 import pl.skf.sws.model.*;
 import pl.skf.sws.service.MovieService;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Set;
 
@@ -24,7 +28,7 @@ public class MovieController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Long> addMovie(
-            @RequestPart("movie") MovieDto movieDto,
+            @RequestPart("movie") @Valid MovieDto movieDto,
             @RequestPart("file") MultipartFile file,
             @RequestPart("userId") Long userId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(movieService.saveMovie(movieDto, file, userId));
@@ -53,6 +57,18 @@ public class MovieController {
             throw new InvalidSortTypeException("Invalid sort type: " + sortBy);
         }
         return ResponseEntity.ok(movieService.getAllMoviesRankingSorted(sortBy, page, size));
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<Resource> downloadMovie(@PathVariable Long id) throws FileNotFoundException {
+
+        MovieFileResource fileResource = movieService.loadFileAsResource(id);
+        String contentDisposition = "attachment; filename=\"" + fileResource.filename() + "\"";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .body(fileResource.resource());
     }
 
 }
