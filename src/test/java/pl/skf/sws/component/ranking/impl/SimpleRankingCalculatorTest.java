@@ -104,7 +104,7 @@ class SimpleRankingCalculatorTest {
     @Test
     void shouldReturn100_whenMovieIsSmall() {
         Movie movie = new Movie();
-        movie.setFileSize(150 * 1024 * 1024L); // 150 MB
+        movie.setFileSize(150 * 1024 * 1024L);
         DigiKatResponse response = new DigiKatResponse();
 
         int result = calculator.calculateRanking(movie, response);
