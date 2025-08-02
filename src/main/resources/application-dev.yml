@@ -8,7 +8,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    show-sql: true
+#    show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   servlet:
     context-path: /skf
@@ -21,8 +21,17 @@ server:
   servlet:
     context-path: /skf
 
+# mocked service in docker
 digikat:
   url: http://localhost:8081
 
 file:
   upload-dir: uploads
+  max-size: 1073741824
+
+thread-pool:
+  size: 10
+
+page:
+  max-size: 50
+  default-size: 5
