@@ -154,4 +154,19 @@ class MovieFileServiceImplTest {
         assertDoesNotThrow(() -> service.deleteFileQuietly(nonExistentPath));
     }
 
+    @Test
+    void deleteFileQuietly_logsError_whenIOExceptionOccurs() {
+        MovieFileServiceImpl service = new MovieFileServiceImpl();
+
+        String fakePath = "fake/path/to/file.txt";
+        Path path = Path.of(fakePath);
+
+        try (MockedStatic<Files> mockedFiles = mockStatic(Files.class)) {
+            mockedFiles.when(() -> Files.deleteIfExists(path))
+                    .thenThrow(new IOException("Cannot delete"));
+
+            assertDoesNotThrow(() -> service.deleteFileQuietly(fakePath));
+        }
+    }
+
 }

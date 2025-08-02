@@ -10,7 +10,12 @@ import pl.skf.sws.model.DigiKatResponse;
 import pl.skf.sws.model.Movie;
 import pl.skf.sws.model.RankingDto;
 
+import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -114,5 +119,31 @@ class MovieRankingServiceTest {
         verify(digiKatRankingAdapter, times(1)).adapt(movie1, response1);
     }
 
+    @Test
+    void getRankingsForMovies_shouldHandleJoinExceptionGracefully() {
+        Movie movie = new Movie();
+        movie.setTitle("BadMovie");
+
+        CompletableFuture<RankingDto> failingFuture = mock(CompletableFuture.class);
+        when(failingFuture.join()).thenThrow(new CompletionException(new RuntimeException("Simulated join failure")));
+
+        Map<String, CompletableFuture<RankingDto>> brokenCache = new ConcurrentHashMap<>();
+        brokenCache.put("BadMovie", failingFuture);
+        setField(service, "cache", brokenCache);
+
+        List<RankingDto> result = service.getRankingsForMovies(List.of(movie));
+
+        assertEquals(0, result.size());
+    }
+
+    private void setField(Object target, String fieldName, Object value) {
+        try {
+            Field field = MovieRankingService.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
 }

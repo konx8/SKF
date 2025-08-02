@@ -101,4 +101,37 @@ class SimpleRankingCalculatorTest {
         assertEquals(0, calculator.calculateRanking(bigMovie, unknownResponse));
     }
 
+    @Test
+    void shouldReturn100_whenMovieIsSmall() {
+        Movie movie = new Movie();
+        movie.setFileSize(150 * 1024 * 1024L); // 150 MB
+        DigiKatResponse response = new DigiKatResponse();
+
+        int result = calculator.calculateRanking(movie, response);
+
+        assertEquals(100, result);
+    }
+
+    @Test
+    void shouldNotReturn100_whenFileSizeIsNull() {
+        Movie movie = new Movie();
+        movie.setFileSize(null);
+        DigiKatResponse response = new DigiKatResponse();
+
+        int result = calculator.calculateRanking(movie, response);
+
+        assertNotEquals(100, result);
+    }
+
+    @Test
+    void shouldNotReturn100_whenMovieIsLarge() {
+        Movie movie = new Movie();
+        movie.setFileSize(500 * 1024 * 1024L);
+        DigiKatResponse response = new DigiKatResponse();
+
+        int result = calculator.calculateRanking(movie, response);
+
+        assertNotEquals(100, result);
+    }
+
 }
